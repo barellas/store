@@ -179,6 +179,7 @@ def plot_layout(largura, comprimento, positions, category, area):
     plt.show()  # Exibe o gráfico
 
 
+
 # Função principal
 def main():
     largura = float(input("Insira a largura em metros: "))

@@ -27,41 +27,44 @@ def check_collision(positions, x, y, obj_largura, obj_comprimento, spacing):
     return False  # Retorna False se não houver colisão
 
 # Função para distribuir objetos em um espaço dado
-# Função para distribuir objetos em um espaço dado
 def distribute_objects(largura, comprimento):
     all_objects = [
-        ((0.5, 0.5), "Trufa"),        # Objeto 1
-        ((0.5, 2), "Caixa 1"),        # Objeto 2
-        ((0.5, 2), "Caixa 2"),        # Objeto 3
-        ((0.4, 2), "Caixa 3"),        # Objeto 4
-        ((1, 2), "Caixa Grande 1"),   # Objeto 5
-        ((1, 2), "Caixa Grande 2"),   # Objeto 6
-        ((0.3, 4), "Caixa Alta 1"),   # Objeto 7
-        ((0.5, 4.5), "Caixa Alta 2"), # Objeto 8
-        ((0.5, 3), "Caixa 4"),        # Objeto 9
-        ((0.5, 1), "Caixa 5"),        # Objeto 10
-        ((0.6, 3), "Lacreme"),        # Objeto 11
-        ((0.4, 2.5), "Caixa 7"),      # Objeto 12
-        ((1, 2), "Caixa Grande 3"),   # Objeto 13
-        ((0.6, 1.8), "Caixa 8"),      # Objeto 14
+        ((0.5, 0.5), "01"),        # Objeto 1
+        ((0.5, 2), "02"),        # Objeto 2
+        ((0.5, 2), "03"),        # Objeto 3
+        ((0.4, 2), "04"),        # Objeto 4
+        ((1, 2), "05"),   # Objeto 5
+        ((1, 2), "06"),   # Objeto 6
+        ((0.3, 4), "07"),   # Objeto 7
+        ((0.5, 4.5), "08"), # Objeto 8
+        ((0.5, 3), "09"),        # Objeto 9
+        ((0.5, 1), "10"),        # Objeto 10
+        ((0.6, 3), "11"),        # Objeto 11
+        ((0.4, 2.5), "12"),      # Objeto 12
+        ((1, 2), "13"),   # Objeto 13
+        ((0.6, 1.8), "14"),      # Objeto 14
         ((0.7, 2), "balcão"),         # Objeto 15
-        ((0.7, 2.1), "Caixa 9"),      # Objeto 16
-        ((0.6, 3), "Lacreme"),        # Objeto 17
-        ((0.7, 2.4), "Caixa 11"),     # Objeto 18
-        ((0.5, 1.5), "Caixa 12"),     # Objeto 19
-        ((1, 2.8), "Caixa Grande 5")  # Objeto 20
+        ((0.7, 2.1), "16"),      # Objeto 16
+        ((0.6, 3), "17"),        # Objeto 17
+        ((0.7, 2.4), "18"),     # Objeto 18
+        ((0.5, 1.5), "19"),     # Objeto 19
+        ((1, 2.8), "20")  # Objeto 20
     ]
     
     positions = []  # Lista para armazenar as posições dos objetos
     spacing = 0.05  # Espaçamento entre os objetos
-    vitrine_spacing = 0.1  # Espaçamento reservado para a vitrine
 
     # Garantir que o objeto "balcão" esteja sempre presente e seja o primeiro a ser distribuído
     selected_objects = [obj for obj in all_objects if obj[1] == "balcão"]
-    selected_objects.extend(random.sample([obj for obj in all_objects if obj[1] != "balcão"], 4))
     
+    # Remover "balcão" da lista de objetos restantes
+    remaining_objects = [obj for obj in all_objects if obj not in selected_objects]
+    
+    # Adicionar objetos aleatórios únicos até ter 20 objetos selecionados
     while len(selected_objects) < 20:
-        selected_objects.append(random.choice(all_objects))  # Adiciona objetos aleatórios até ter 20 objetos selecionados
+        obj = random.choice(remaining_objects)
+        selected_objects.append(obj)
+        remaining_objects.remove(obj)
     
     # Priorizar a escolha de objetos que proporcionem a maior quantidade ao longo do perímetro
     selected_objects.sort(key=lambda x: (2 * (largura // x[0][0] + comprimento // x[0][1])), reverse=True)
@@ -85,12 +88,7 @@ def distribute_objects(largura, comprimento):
         label = nome
         if x + largura_max <= largura and len(positions) < 20:
             if not check_collision(positions, x, y, largura_max, comprimento_max, spacing):
-                if largura > comprimento:
-                    if x + largura_max + vitrine_spacing <= largura:  # Verifica a linha da vitrine
-                        positions.append((x, y, largura_max, comprimento_max, label))
-                else:
-                    if y + comprimento_max + vitrine_spacing <= comprimento:  # Verifica a linha da vitrine
-                        positions.append((x, y, largura_max, comprimento_max, label))
+                positions.append((x, y, largura_max, comprimento_max, label))
             x += largura_max + spacing
         
     x, y = 0, y_balcao + balcão_comprimento + spacing
@@ -100,12 +98,7 @@ def distribute_objects(largura, comprimento):
         label = nome
         if y + comprimento_max <= comprimento and len(positions) < 20:
             if not check_collision(positions, x, y, largura_max, comprimento_max, spacing):
-                if largura > comprimento:
-                    if x + largura_max + vitrine_spacing <= largura:  # Verifica a linha da vitrine
-                        positions.append((x, y, largura_max, comprimento_max, label))
-                else:
-                    if y + comprimento_max + vitrine_spacing <= comprimento:  # Verifica a linha da vitrine
-                        positions.append((x, y, largura_max, comprimento_max, label))
+                positions.append((x, y, largura_max, comprimento_max, label))
             y += comprimento_max + spacing
     
     x, y = largura, y_balcao + balcão_comprimento + spacing
@@ -115,12 +108,7 @@ def distribute_objects(largura, comprimento):
         label = nome
         if y + comprimento_max <= comprimento and len(positions) < 20:
             if not check_collision(positions, x - largura_max, y, largura_max, comprimento_max, spacing):
-                if largura > comprimento:
-                    if x - largura_max - vitrine_spacing >= 0:  # Verifica a linha da vitrine
-                        positions.append((x - largura_max, y, largura_max, comprimento_max, label))
-                else:
-                    if y + comprimento_max + vitrine_spacing <= comprimento:  # Verifica a linha da vitrine
-                        positions.append((x - largura_max, y, largura_max, comprimento_max, label))
+                positions.append((x - largura_max, y, largura_max, comprimento_max, label))
             y += comprimento_max + spacing
     
     x, y = largura, comprimento
@@ -130,12 +118,7 @@ def distribute_objects(largura, comprimento):
         label = nome
         if x - largura_max >= 0 and len(positions) < 20:
             if not check_collision(positions, x - largura_max, y - comprimento_max, largura_max, comprimento_max, spacing):
-                if largura > comprimento:
-                    if x - largura_max - vitrine_spacing >= 0:  # Verifica a linha da vitrine
-                        positions.append((x - largura_max, y - comprimento_max, largura_max, comprimento_max, label))
-                else:
-                    if y - comprimento_max - vitrine_spacing >= 0:  # Verifica a linha da vitrine
-                        positions.append((x - largura_max, y - comprimento_max, largura_max, comprimento_max, label))
+                positions.append((x - largura_max, y - comprimento_max, largura_max, comprimento_max, label))
             x -= largura_max + spacing
 
     return positions  # Retorna a lista de posições dos objetos
@@ -143,7 +126,7 @@ def distribute_objects(largura, comprimento):
 
 # Função para plotar o layout
 def plot_layout(largura, comprimento, positions, category, area):
-    fig, ax = plt.subplots(figsize=(10.24, 10.24), dpi=100)  # Cria uma figura para plotar
+    fig, ax = plt.subplots(figsize=(7.2, 7.2), dpi=100)  # Cria uma figura para plotar
     ax.set_xlim(0, largura)
     ax.set_ylim(0, comprimento)  # Define os limites dos eixos
     ax.set_aspect('equal')  # Define a proporção dos eixos como igual
@@ -156,7 +139,7 @@ def plot_layout(largura, comprimento, positions, category, area):
 
     text_x = largura - 0.1
     text_y = comprimento - (-0.8)
-    line_spacing = 0.15  # Espaçamento constante entre as linhas de texto
+    line_spacing = 0.20  # Espaçamento constante entre as linhas de texto
 
     # Adiciona textos com informações sobre o layout
     plt.text(text_x, text_y, f"L: {largura}m", ha='right', va='top')
@@ -177,7 +160,6 @@ def plot_layout(largura, comprimento, positions, category, area):
         plt.text(largura / 2, -0.05, 'Vitrine', ha='center', va='center', color='blue')
 
     plt.show()  # Exibe o gráfico
-
 
 
 # Função principal
